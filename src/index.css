@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background-color: #050505;
+  color: #f3f4f6;
+  font-family: 'Inter', 'Noto Sans Arabic', sans-serif;
+  overflow-x: hidden;
+}
+
+/* تحسين شكل السكرول بار ليناسب التصميم */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #6366f1;
+  border-radius: 10px;
+}
+
+/* تأثير Glassmorphism مخصص */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* اتجاه النص للعربية */
+[dir="rtl"] {
+  text-align: right;
+}

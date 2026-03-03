@@ -608,3 +608,69 @@ const BottomNav: React.FC<{
   onChange: (k: NavKey) => void;
 }> = ({ current, onChange }) => {
   const items: { key: NavKey; label: string; icon: React.ReactNode }[] = [
+    { key: 'chat', label: 'الدردشة', icon: <MessageCircle className="h-5 w-5" /> },
+    { key: 'dashboard', label: 'الرئيسية', icon: <LayoutDashboard className="h-5 w-5" /> },
+    { key: 'settings', label: 'الإعدادات', icon: <Settings className="h-5 w-5" /> },
+  ];
+
+  return (
+    <div className="fixed bottom-6 left-1/2 z-50 w-[90%] max-w-md -translate-x-1/2">
+      <div className="flex items-center justify-around rounded-2xl border border-white/10 bg-black/60 p-2 backdrop-blur-2xl shadow-2xl">
+        {items.map((item) => {
+          const active = current === item.key;
+          return (
+            <button
+              key={item.key}
+              onClick={() => onChange(item.key)}
+              className={`flex flex-col items-center gap-1 p-2 transition-all ${
+                active ? 'text-indigo-400 scale-110' : 'text-zinc-500 hover:text-zinc-300'
+              }`}
+            >
+              {item.icon}
+              <span className="text-[10px] font-bold">{item.label}</span>
+              {active && <div className="h-1 w-1 rounded-full bg-indigo-400 shadow-[0_0_8px_#6366f1]" />}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+export default function App() {
+  const { user, initializing } = useAuthState();
+  const clanUser = useClanUser(user);
+  const [view, setView] = useState<NavKey>('chat');
+  const [membersCount, setMembersCount] = useState(0);
+
+  useEffect(() => {
+    const usersRef = ref(db, 'users');
+    const unsub = onValue(usersRef, (snap) => {
+      setMembersCount(snap.size);
+    });
+    return () => unsub();
+  }, []);
+
+  if (initializing) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#050505]">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-indigo-500/20 border-t-indigo-500" />
+      </div>
+    );
+  }
+
+  if (!user || !clanUser) {
+    return <AuthView />;
+  }
+
+  return (
+    <div className="min-h-screen bg-[#050505] text-zinc-100 pb-28 pt-6 px-4" dir="rtl">
+      <div className="mx-auto max-w-md h-full">
+        {view === 'chat' && <GlobalChatView currentUser={user} clanUser={clanUser} />}
+        {view === 'dashboard' && <DashboardView clanUser={clanUser} membersCount={membersCount} />}
+        {view === 'settings' && <SettingsView user={user} clanUser={clanUser} />}
+        <BottomNav current={view} onChange={setView} />
+      </div>
+    </div>
+  );
+}
